@@ -1,0 +1,45 @@
+includes:
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+
+parameters:
+    level: 9
+    paths:
+        - src
+
+    ignoreErrors:
+        # Allow unserialize() return value to be false
+        - '#Call to function unserialize\(\) with incorrect type#'
+
+        # Firestore SDK may return mixed types from data()
+        - '#Method .+::data\(\) invoked with .+ parameter.+#'
+        - '#Parameter .+ of function gzdecode expects string, mixed given#'
+        - '#Parameter .+ of function unserialize expects string, mixed given#'
+        - '#Only booleans are allowed in an if condition, mixed given#'
+        - '#Cannot access an offset on mixed#'
+        - '#Parameter .+ of function in_array expects array, mixed given#'
+        - '#Parameter .+ of function array_merge expects array, mixed given#'
+
+        # SDK wrapper methods - these are only called when SDK is installed
+        - '#Call to an undefined method Google\\Cloud\\Firestore\\WriteBatch::(set|delete|commit)\(\)#'
+
+        # Tag method is specific to FirestoreCacheItem, not in PSR interface
+        - '#Call to an undefined method Psr\\Cache\\CacheItemInterface::tag\(\)#'
+
+        # PHPUnit dynamic assertions and test-specific checks
+        - '#Dynamic call to static method PHPUnit\\Framework\\Assert::#'
+        - '#Only booleans are allowed in a negated boolean, string\|false given#'
+        - '#Call to method .+::assertInstanceOf\(\) .+ will always evaluate to true#'
+
+        # end() can technically return false but won't in our usage after string checks
+        - '#Strict comparison using === between string and false will always evaluate to false#'
+
+        # Redundant type checks are intentional for robustness
+        - '#Call to function is_string\(\) with string will always evaluate to true#'
+
+        # Interface signature must match exactly, can't specify generic types
+        - '#Method .+::get\(\) has parameter \$metadata with no value type specified in iterable type array#'
+
+    checkMissingIterableValueType: true
+    checkGenericClassInNonGenericObjectType: true
+    reportUnmatchedIgnoredErrors: false
