@@ -45,7 +45,7 @@ interface FirestoreClientInterface
     /**
      * Create a new batch operation.
      */
-    public function batch(): BatchInterface;
+    public function createBatch(): BatchInterface;
 
     /**
      * Delete all documents in a collection (in batches).

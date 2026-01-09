@@ -65,7 +65,7 @@ class FirestoreAdapter extends AbstractAdapter
                     continue;
                 }
 
-                $data = $snapshot->data();
+                $data = $snapshot->getData();
                 $expiry = $data[self::METADATA_EXPIRY_FIELD] ?? null;
 
                 // Check expiration
@@ -97,7 +97,7 @@ class FirestoreAdapter extends AbstractAdapter
                 return false;
             }
 
-            $data = $snapshot->data();
+            $data = $snapshot->getData();
             $expiry = $data[self::METADATA_EXPIRY_FIELD] ?? null;
 
             // Check if expired
@@ -129,11 +129,11 @@ class FirestoreAdapter extends AbstractAdapter
                     $namespace
                 );
 
-                $batch = $this->client->batch();
+                $batch = $this->client->createBatch();
                 $count = 0;
 
                 foreach ($docs as $doc) {
-                    $docId = $doc->id();
+                    $docId = $doc->getId();
                     if (!str_starts_with($docId, $namespace)) {
                         break;
                     }
@@ -143,7 +143,7 @@ class FirestoreAdapter extends AbstractAdapter
 
                     if ($count >= 500) {
                         $batch->commit();
-                        $batch = $this->client->batch();
+                        $batch = $this->client->createBatch();
                         $count = 0;
                     }
                 }
@@ -167,7 +167,7 @@ class FirestoreAdapter extends AbstractAdapter
     protected function doDelete(array $ids): bool
     {
         try {
-            $batch = $this->client->batch();
+            $batch = $this->client->createBatch();
 
             foreach ($ids as $id) {
                 $batch->delete($this->collection, $id);
@@ -196,7 +196,7 @@ class FirestoreAdapter extends AbstractAdapter
         }
 
         try {
-            $batch = $this->client->batch();
+            $batch = $this->client->createBatch();
             $expiry = $lifetime > 0 ? time() + $lifetime : null;
 
             foreach ($values as $id => $value) {

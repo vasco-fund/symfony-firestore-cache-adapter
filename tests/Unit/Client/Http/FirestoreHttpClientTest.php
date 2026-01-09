@@ -45,7 +45,7 @@ final class FirestoreHttpClientTest extends TestCase
 
         $snapshot = $client->getDocument('cache', 'doc');
 
-        self::assertSame('doc', $snapshot->id());
+        self::assertSame('doc', $snapshot->getId());
         self::assertTrue($snapshot->exists());
     }
 
@@ -124,7 +124,7 @@ final class FirestoreHttpClientTest extends TestCase
         $httpClient = $this->createMock(HttpClientInterface::class);
         $client = $this->createClientWithCalls($httpClient, 1);
 
-        $batch = $client->batch();
+        $batch = $client->createBatch();
 
         self::assertInstanceOf(HttpBatch::class, $batch);
     }
@@ -171,7 +171,7 @@ final class FirestoreHttpClientTest extends TestCase
 
         self::assertCount(1, $results);
         self::assertInstanceOf(HttpDocumentSnapshot::class, $results[0]);
-        self::assertSame(['count' => 2], $results[0]->data());
+        self::assertSame(['count' => 2], $results[0]->getData());
     }
 
     public function testQueryDocumentsAddsLimitWhenProvided(): void

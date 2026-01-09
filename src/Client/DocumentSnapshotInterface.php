@@ -19,10 +19,10 @@ interface DocumentSnapshotInterface
      *
      * @return array<string, mixed>|null
      */
-    public function data(): ?array;
+    public function getData(): ?array;
 
     /**
      * Get the document ID.
      */
-    public function id(): string;
+    public function getId(): string;
 }

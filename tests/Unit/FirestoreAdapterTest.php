@@ -22,14 +22,14 @@ final class FirestoreAdapterTest extends TestCase
 
         $snapshotHit = $this->createMock(DocumentSnapshotInterface::class);
         $snapshotHit->method('exists')->willReturn(true);
-        $snapshotHit->method('data')->willReturn([
+        $snapshotHit->method('getData')->willReturn([
             'expiry' => time() + 60,
             'value' => 'serialized',
         ]);
 
         $snapshotExpired = $this->createMock(DocumentSnapshotInterface::class);
         $snapshotExpired->method('exists')->willReturn(true);
-        $snapshotExpired->method('data')->willReturn([
+        $snapshotExpired->method('getData')->willReturn([
             'expiry' => time() - 60,
             'value' => 'stale',
         ]);
@@ -63,7 +63,7 @@ final class FirestoreAdapterTest extends TestCase
 
         $snapshot = $this->createMock(DocumentSnapshotInterface::class);
         $snapshot->method('exists')->willReturn(true);
-        $snapshot->method('data')->willReturn([
+        $snapshot->method('getData')->willReturn([
             'expiry' => time() - 60,
         ]);
 
@@ -73,7 +73,7 @@ final class FirestoreAdapterTest extends TestCase
             ->willReturn($snapshot);
 
         $client->expects($this->once())
-            ->method('batch')
+            ->method('createBatch')
             ->willReturn($batch);
 
         $batch->expects($this->once())
@@ -96,7 +96,7 @@ final class FirestoreAdapterTest extends TestCase
 
         $snapshot = $this->createMock(DocumentSnapshotInterface::class);
         $snapshot->method('exists')->willReturn(true);
-        $snapshot->method('data')->willReturn([
+        $snapshot->method('getData')->willReturn([
             'expiry' => time() + 60,
         ]);
 
@@ -131,13 +131,13 @@ final class FirestoreAdapterTest extends TestCase
         $batch = $this->createMock(BatchInterface::class);
 
         $doc1 = $this->createMock(DocumentSnapshotInterface::class);
-        $doc1->method('id')->willReturn('ns:key1');
+        $doc1->method('getId')->willReturn('ns:key1');
 
         $doc2 = $this->createMock(DocumentSnapshotInterface::class);
-        $doc2->method('id')->willReturn('other:key');
+        $doc2->method('getId')->willReturn('other:key');
 
         $doc3 = $this->createMock(DocumentSnapshotInterface::class);
-        $doc3->method('id')->willReturn('ns:key2');
+        $doc3->method('getId')->willReturn('ns:key2');
 
         $client->expects($this->once())
             ->method('queryDocuments')
@@ -145,7 +145,7 @@ final class FirestoreAdapterTest extends TestCase
             ->willReturn([$doc1, $doc2, $doc3]);
 
         $client->expects($this->once())
-            ->method('batch')
+            ->method('createBatch')
             ->willReturn($batch);
 
         $batch->expects($this->once())
@@ -173,7 +173,7 @@ final class FirestoreAdapterTest extends TestCase
             ->willReturn(['item' => 'serialized']);
 
         $client->expects($this->once())
-            ->method('batch')
+            ->method('createBatch')
             ->willReturn($batch);
 
         $batch->expects($this->once())
@@ -203,7 +203,7 @@ final class FirestoreAdapterTest extends TestCase
             ->willReturn(['item' => 'serialized']);
 
         $client->expects($this->once())
-            ->method('batch')
+            ->method('createBatch')
             ->willReturn($batch);
 
         $start = time();
@@ -238,7 +238,7 @@ final class FirestoreAdapterTest extends TestCase
         $batch = $this->createMock(BatchInterface::class);
 
         $client->expects($this->once())
-            ->method('batch')
+            ->method('createBatch')
             ->willReturn($batch);
 
         $batch->expects($this->once())
@@ -264,7 +264,7 @@ final class FirestoreAdapterTest extends TestCase
         $docs = [];
         for ($i = 0; $i < 501; ++$i) {
             $doc = $this->createMock(DocumentSnapshotInterface::class);
-            $doc->method('id')->willReturn('ns:key' . $i);
+            $doc->method('getId')->willReturn('ns:key' . $i);
             $docs[] = $doc;
         }
 
@@ -273,7 +273,7 @@ final class FirestoreAdapterTest extends TestCase
             ->willReturn($docs);
 
         $client->expects($this->exactly(2))
-            ->method('batch')
+            ->method('createBatch')
             ->willReturnOnConsecutiveCalls($batch1, $batch2);
 
         $batch1->expects($this->exactly(500))
@@ -302,7 +302,7 @@ final class FirestoreAdapterTest extends TestCase
             ->willReturn([]);
 
         $client->expects($this->once())
-            ->method('batch')
+            ->method('createBatch')
             ->willReturn($batch);
 
         $batch->expects($this->never())

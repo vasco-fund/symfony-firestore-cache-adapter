@@ -72,7 +72,7 @@ final class HttpBatch implements BatchInterface
     private function executeSet(string $collection, string $documentId, array $data): void
     {
         $url = \sprintf(
-            'https://firestore.googleapis.com/v1/projects/%s/databases/%s/documents/%s/%s',
+            FirestoreHttpClient::FIRESTORE_BASE_URL . '/documents/%s/%s',
             $this->projectId,
             $this->database,
             $collection,
@@ -84,7 +84,7 @@ final class HttpBatch implements BatchInterface
         ];
 
         $this->httpClient->request('PATCH', $url, [
-            'headers' => $this->headers(),
+            'headers' => $this->getHeaders(),
             'json' => $payload,
         ]);
     }
@@ -92,7 +92,7 @@ final class HttpBatch implements BatchInterface
     private function executeDelete(string $collection, string $documentId): void
     {
         $url = \sprintf(
-            'https://firestore.googleapis.com/v1/projects/%s/databases/%s/documents/%s/%s',
+            FirestoreHttpClient::FIRESTORE_BASE_URL . '/documents/%s/%s',
             $this->projectId,
             $this->database,
             $collection,
@@ -100,14 +100,14 @@ final class HttpBatch implements BatchInterface
         );
 
         $this->httpClient->request('DELETE', $url, [
-            'headers' => $this->headers(),
+            'headers' => $this->getHeaders(),
         ]);
     }
 
     /**
      * @return array<string, string>
      */
-    private function headers(): array
+    private function getHeaders(): array
     {
         return [
             'Authorization' => 'Bearer ' . $this->accessToken,

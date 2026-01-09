@@ -37,7 +37,7 @@ composer require google/cloud-firestore
 ## Requirements
 
 - PHP 8.2 or higher
-- Symfony 6.4 or 7.x
+- Symfony 7.4 or 8.x
 - Google Cloud Firestore credentials
 - **Optional**: `grpc` PHP extension (only required if using Google Cloud SDK)
 
@@ -150,9 +150,9 @@ GOOGLE_CLOUD_PROJECT=your-project-id
 
 ### Best Practices
 
-3. **Set appropriate TTL** - Don't cache forever
-4. **Monitor Firestore usage** in GCP Console
-5. **Use namespaces** for multi-environment setups
+1. **Set appropriate TTL** - Don't cache forever
+2. **Monitor Firestore usage** in GCP Console
+3. **Use namespaces** for multi-environment setups
 
 ## Testing
 
@@ -240,7 +240,7 @@ A: Firestore pricing is per storage size and per operation. With compression and
 A: Yes! This adapter is production-ready with comprehensive tests, strict type checking (PHPStan level 9), and follows Symfony best practices.
 
 **Q: Does it work with Symfony 6?**
-A: Yes, it supports Symfony 6.4 LTS and Symfony 7.x.
+A: Yes, it supports Symfony 7.4 LTS and Symfony 8.x.
 
 **Q: Do I need the grpc extension?**
 A: No! By default, the adapter uses Symfony HTTP Client which requires no extensions. You can optionally use the Google Cloud SDK for better performance if you have the grpc extension installed.

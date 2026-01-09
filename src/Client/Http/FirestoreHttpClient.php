@@ -19,6 +19,7 @@ use Vasco\FirestoreCache\Client\FirestoreClientInterface;
  */
 final class FirestoreHttpClient implements FirestoreClientInterface
 {
+    public const FIRESTORE_BASE_URL = 'https://firestore.googleapis.com/v1/projects/%s/databases/%s';
     private HttpClientInterface $httpClient;
     private AccessTokenRetriever $accessTokenRetriever;
     private ?string $accessToken;
@@ -59,7 +60,7 @@ final class FirestoreHttpClient implements FirestoreClientInterface
             'fields' => FieldFormatter::formatFields($data),
         ];
 
-        $response = $this->httpClient->request('PATCH', $url, [
+        $this->httpClient->request('PATCH', $url, [
             'headers' => $this->headers(),
             'json' => $payload,
         ]);
@@ -82,7 +83,7 @@ final class FirestoreHttpClient implements FirestoreClientInterface
         ?int $limit = null,
     ): iterable {
         $url = \sprintf(
-            'https://firestore.googleapis.com/v1/projects/%s/databases/%s/documents:runQuery',
+            self::FIRESTORE_BASE_URL . '/documents:runQuery',
             $this->projectId,
             $this->database
         );
@@ -124,6 +125,11 @@ final class FirestoreHttpClient implements FirestoreClientInterface
                 }
                 $parts = explode('/', $name);
                 $docId = end($parts);
+                /**
+                 * end() can technically return false but won't in our usage after string checks.
+                 *
+                 * @phpstan-ignore identical.alwaysFalse
+                 */
                 if ($docId === false) {
                     continue;
                 }
@@ -133,7 +139,7 @@ final class FirestoreHttpClient implements FirestoreClientInterface
         }
     }
 
-    public function batch(): BatchInterface
+    public function createBatch(): BatchInterface
     {
         return new HttpBatch(
             $this->httpClient,
@@ -146,7 +152,7 @@ final class FirestoreHttpClient implements FirestoreClientInterface
     public function deleteCollection(string $collection, int $batchSize): void
     {
         $url = \sprintf(
-            'https://firestore.googleapis.com/v1/projects/%s/databases/%s/documents/%s',
+            self::FIRESTORE_BASE_URL . '/documents/%s',
             $this->projectId,
             $this->database,
             $collection
@@ -165,7 +171,7 @@ final class FirestoreHttpClient implements FirestoreClientInterface
                 return;
             }
 
-            $batch = $this->batch();
+            $batch = $this->createBatch();
             foreach ($documents as $document) {
                 if (!\is_array($document)) {
                     continue;
@@ -176,6 +182,11 @@ final class FirestoreHttpClient implements FirestoreClientInterface
                 }
                 $parts = explode('/', $name);
                 $docId = end($parts);
+                /**
+                 * end() can technically return false but won't in our usage after string checks.
+                 *
+                 * @phpstan-ignore identical.alwaysFalse
+                 */
                 if ($docId === false) {
                     continue;
                 }
@@ -201,7 +212,7 @@ final class FirestoreHttpClient implements FirestoreClientInterface
     private function documentUrl(string $collection, string $documentId): string
     {
         return \sprintf(
-            'https://firestore.googleapis.com/v1/projects/%s/databases/%s/documents/%s/%s',
+            self::FIRESTORE_BASE_URL . '/documents/%s/%s',
             $this->projectId,
             $this->database,
             $collection,

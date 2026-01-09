@@ -30,7 +30,7 @@ final class HttpDocumentSnapshot implements DocumentSnapshotInterface
         return $this->response->getStatusCode() !== 404;
     }
 
-    public function data(): ?array
+    public function getData(): ?array
     {
         if ($this->responseParsed) {
             return $this->data;
@@ -56,7 +56,7 @@ final class HttpDocumentSnapshot implements DocumentSnapshotInterface
         return $this->data;
     }
 
-    public function id(): string
+    public function getId(): string
     {
         return $this->id;
     }

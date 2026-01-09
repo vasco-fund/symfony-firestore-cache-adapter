@@ -55,7 +55,7 @@ final class HttpDocumentSnapshotTest extends TestCase
 
         $snapshot = new HttpDocumentSnapshot('doc', $response);
 
-        $data = $snapshot->data();
+        $data = $snapshot->getData();
 
         self::assertIsArray($data);
         self::assertSame('cache', $data['name']);
@@ -78,7 +78,7 @@ final class HttpDocumentSnapshotTest extends TestCase
 
         $snapshot = new HttpDocumentSnapshot('doc', $response);
 
-        self::assertNull($snapshot->data());
+        self::assertNull($snapshot->getData());
     }
 
     public function testFromApiResponseBuildsSnapshot(): void
@@ -89,8 +89,8 @@ final class HttpDocumentSnapshotTest extends TestCase
             ],
         ]);
 
-        self::assertSame('doc', $snapshot->id());
+        self::assertSame('doc', $snapshot->getId());
         self::assertTrue($snapshot->exists());
-        self::assertSame(['key' => 'value'], $snapshot->data());
+        self::assertSame(['key' => 'value'], $snapshot->getData());
     }
 }
