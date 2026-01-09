@@ -6,7 +6,6 @@ namespace Vasco\FirestoreCache\Tests\Unit\Client\Http;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 use Vasco\FirestoreCache\Client\Http\HttpDocumentSnapshot;
 
 #[CoversClass(HttpDocumentSnapshot::class)]

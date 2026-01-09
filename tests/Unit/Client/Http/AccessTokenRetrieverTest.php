@@ -10,7 +10,7 @@ final class ApplicationDefaultCredentials
 
     public static function getCredentials(): object
     {
-        if (null === self::$credentials) {
+        if (self::$credentials === null) {
             throw new \RuntimeException('Credentials not set for test');
         }
 
@@ -23,7 +23,6 @@ namespace Vasco\FirestoreCache\Tests\Unit\Client\Http;
 use Google\Auth\ApplicationDefaultCredentials;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
-use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Vasco\FirestoreCache\Client\Http\AccessTokenRetriever;
 
