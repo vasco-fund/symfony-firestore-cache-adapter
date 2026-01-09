@@ -17,12 +17,11 @@ use Vasco\FirestoreCache\Client\FirestoreClientInterface;
  * This implementation uses the Firestore REST API and doesn't require
  * the grpc extension, making it easier to deploy in various environments.
  */
-final class FirestoreHttpClient implements FirestoreClientInterface
+final readonly class FirestoreHttpClient implements FirestoreClientInterface
 {
     public const FIRESTORE_BASE_URL = 'https://firestore.googleapis.com/v1/projects/%s/databases/%s';
     private HttpClientInterface $httpClient;
     private AccessTokenRetriever $accessTokenRetriever;
-    private ?string $accessToken;
 
     public function __construct(
         private string $projectId,
@@ -43,10 +42,10 @@ final class FirestoreHttpClient implements FirestoreClientInterface
                 'headers' => $this->headers(),
             ]);
 
-            return new HttpDocumentSnapshot($documentId, $response);
+            return new LazyHttpDocumentSnapshot($documentId, $response);
         } catch (HttpExceptionInterface $e) {
             if ($e->getResponse()->getStatusCode() === 404) {
-                return new HttpDocumentSnapshot($documentId, $e->getResponse());
+                return HttpDocumentSnapshot::fromEmptyResponse($documentId);
             }
             throw $e;
         }
@@ -145,7 +144,7 @@ final class FirestoreHttpClient implements FirestoreClientInterface
             $this->httpClient,
             $this->projectId,
             $this->database,
-            $this->getAccessToken()
+            $this->accessTokenRetriever
         );
     }
 
@@ -247,17 +246,8 @@ final class FirestoreHttpClient implements FirestoreClientInterface
     private function headers(): array
     {
         return [
-            'Authorization' => 'Bearer ' . $this->getAccessToken(),
+            'Authorization' => 'Bearer ' . $this->accessTokenRetriever->getToken(),
             'Content-Type' => 'application/json',
         ];
-    }
-
-    private function getAccessToken(): string
-    {
-        if (isset($this->accessToken) === false) {
-            $this->accessToken = $this->accessTokenRetriever->getToken();
-        }
-
-        return $this->accessToken;
     }
 }

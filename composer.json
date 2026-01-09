@@ -58,7 +58,7 @@
         "phpstan": "phpstan analyse -c phpstan.neon -v",
         "cs:check": "php-cs-fixer fix --dry-run --diff",
         "cs:fix": "php-cs-fixer fix",
-        "infection": "infection --min-msi=94 --min-covered-msi=94",
+        "infection": "infection --min-msi=97 --min-covered-msi=97",
         "qa": [
             "@cs:check",
             "@phpstan",

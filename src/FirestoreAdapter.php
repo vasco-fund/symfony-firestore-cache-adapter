@@ -46,7 +46,6 @@ class FirestoreAdapter extends AbstractAdapter
      */
     protected function doFetch(array $ids): iterable
     {
-        $now = time();
         $results = [];
 
         $snapshots = [];
@@ -69,7 +68,7 @@ class FirestoreAdapter extends AbstractAdapter
                 $expiry = $data[self::METADATA_EXPIRY_FIELD] ?? null;
 
                 // Check expiration
-                if ($expiry !== null && $expiry < $now) {
+                if ($expiry !== null && $expiry < time()) {
                     continue;
                 }
 

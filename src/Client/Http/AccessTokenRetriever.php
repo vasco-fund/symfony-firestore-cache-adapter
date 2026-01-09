@@ -8,14 +8,20 @@ use Google\Auth\ApplicationDefaultCredentials;
 
 class AccessTokenRetriever
 {
+    private string $accessToken;
+
     public function getToken(): string
     {
-        $authToken = ApplicationDefaultCredentials::getCredentials()->fetchAuthToken();
+        if (!isset($this->accessToken)) {
+            $authToken = ApplicationDefaultCredentials::getCredentials()->fetchAuthToken();
 
-        if (isset($authToken['access_token']) && \is_string($authToken['access_token'])) {
-            return $authToken['access_token'];
+            if (isset($authToken['access_token']) && \is_string($authToken['access_token'])) {
+                $this->accessToken = $authToken['access_token'];
+            } else {
+                throw new \RuntimeException('Failed to retrieve access token');
+            }
         }
 
-        throw new \RuntimeException('Failed to retrieve access token');
+        return $this->accessToken;
     }
 }

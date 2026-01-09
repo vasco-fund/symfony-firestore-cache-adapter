@@ -10,15 +10,19 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Vasco\FirestoreCache\Client\Http\AccessTokenRetriever;
+use Vasco\FirestoreCache\Client\Http\BatchOperation;
 use Vasco\FirestoreCache\Client\Http\FieldFormatter;
 use Vasco\FirestoreCache\Client\Http\FirestoreHttpClient;
 use Vasco\FirestoreCache\Client\Http\HttpBatch;
 use Vasco\FirestoreCache\Client\Http\HttpDocumentSnapshot;
+use Vasco\FirestoreCache\Client\Http\LazyHttpDocumentSnapshot;
 
 #[CoversClass(FirestoreHttpClient::class)]
 #[UsesClass(FieldFormatter::class)]
 #[UsesClass(HttpDocumentSnapshot::class)]
+#[UsesClass(LazyHttpDocumentSnapshot::class)]
 #[UsesClass(HttpBatch::class)]
+#[UsesClass(BatchOperation::class)]
 final class FirestoreHttpClientTest extends TestCase
 {
     public function testGetDocumentReturnsSnapshot(): void
@@ -122,7 +126,7 @@ final class FirestoreHttpClientTest extends TestCase
     public function testBatchReturnsHttpBatch(): void
     {
         $httpClient = $this->createMock(HttpClientInterface::class);
-        $client = $this->createClientWithCalls($httpClient, 1);
+        $client = $this->createClientWithCalls($httpClient, 0);
 
         $batch = $client->createBatch();
 
@@ -214,7 +218,7 @@ final class FirestoreHttpClientTest extends TestCase
             $this->createResponse(['documents' => []]),
         ]);
 
-        $client = $this->createClientWithCalls($httpClient, 1);
+        $client = $this->createClientWithCalls($httpClient, 4);
 
         $client->deleteCollection('cache', 2);
 

@@ -9,17 +9,24 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use Vasco\FirestoreCache\Client\Http\AccessTokenRetriever;
+use Vasco\FirestoreCache\Client\Http\BatchOperation;
 use Vasco\FirestoreCache\Client\Http\FieldFormatter;
 use Vasco\FirestoreCache\Client\Http\HttpBatch;
 
 #[CoversClass(HttpBatch::class)]
 #[UsesClass(FieldFormatter::class)]
+#[UsesClass(BatchOperation::class)]
 final class HttpBatchTest extends TestCase
 {
     public function testCommitExecutesQueuedOperations(): void
     {
+        $tokenRetriever = $this->createMock(AccessTokenRetriever::class);
+        $tokenRetriever->method('getToken')
+            ->willReturn('token');
+
         $httpClient = new RecordingHttpClient();
-        $batch = new HttpBatch($httpClient, 'project', '(default)', 'token');
+        $batch = new HttpBatch($httpClient, 'project', '(default)', $tokenRetriever);
 
         $batch->set('cache', 'doc', ['value' => 10])
             ->delete('cache', 'doc')

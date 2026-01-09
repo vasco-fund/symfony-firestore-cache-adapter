@@ -15,36 +15,29 @@ use Vasco\FirestoreCache\Client\BatchInterface;
  */
 final class HttpBatch implements BatchInterface
 {
-    /** @var array<array{type: string, collection: string, documentId: string, data?: array<string, mixed>}> */
+    /**
+     * @var BatchOperation[]
+     */
     private array $operations = [];
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly string $projectId,
         private readonly string $database,
-        private readonly string $accessToken,
+        private readonly AccessTokenRetriever $accessTokenRetriever,
     ) {
     }
 
     public function set(string $collection, string $documentId, array $data): self
     {
-        $this->operations[] = [
-            'type' => 'set',
-            'collection' => $collection,
-            'documentId' => $documentId,
-            'data' => $data,
-        ];
+        $this->operations[] = new BatchOperation('set', $collection, $documentId, $data);
 
         return $this;
     }
 
     public function delete(string $collection, string $documentId): self
     {
-        $this->operations[] = [
-            'type' => 'delete',
-            'collection' => $collection,
-            'documentId' => $documentId,
-        ];
+        $this->operations[] = new BatchOperation('delete', $collection, $documentId);
 
         return $this;
     }
@@ -52,14 +45,17 @@ final class HttpBatch implements BatchInterface
     public function commit(): void
     {
         foreach ($this->operations as $operation) {
-            if ($operation['type'] === 'set') {
+            if ($operation->type === 'set') {
                 $this->executeSet(
-                    $operation['collection'],
-                    $operation['documentId'],
-                    $operation['data'] ?? []
+                    $operation->collection,
+                    $operation->documentId,
+                    $operation->data ?? []
                 );
-            } elseif ($operation['type'] === 'delete') {
-                $this->executeDelete($operation['collection'], $operation['documentId']);
+            } elseif ($operation->type === 'delete') {
+                $this->executeDelete(
+                    $operation->collection,
+                    $operation->documentId
+                );
             }
         }
 
@@ -110,7 +106,7 @@ final class HttpBatch implements BatchInterface
     private function getHeaders(): array
     {
         return [
-            'Authorization' => 'Bearer ' . $this->accessToken,
+            'Authorization' => 'Bearer ' . $this->accessTokenRetriever->getToken(),
             'Content-Type' => 'application/json',
         ];
     }
