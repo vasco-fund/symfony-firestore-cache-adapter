@@ -1,7 +1,6 @@
 # Symfony Firestore Cache Adapter
 
-[![Build Status](https://github.com/vasco-fund/symfony-firestore-cache-adapter/workflows/CI/badge.svg)](https://github.com/vasco-fund/symfony-firestore-cache-adapter/actions)
-[![Coverage Status](https://codecov.io/gh/vasco-fund/symfony-firestore-cache-adapter/branch/main/graph/badge.svg)](https://codecov.io/gh/vasco-fund/symfony-firestore-cache-adapter)
+[![Build Status](https://github.com/vasco-fund/symfony-firestore-cache-adapter/actions/workflows/ci.yml/badge.svg)](https://github.com/vasco-fund/symfony-firestore-cache-adapter/actions/workflows/ci.yml)
 [![PHPStan Level](https://img.shields.io/badge/PHPStan-level%209-brightgreen.svg)](phpstan.neon)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Latest Stable Version](https://poser.pugx.org/vasco-fund/symfony-firestore-cache-adapter/v/stable)](https://packagist.org/packages/vasco-fund/symfony-firestore-cache-adapter)
