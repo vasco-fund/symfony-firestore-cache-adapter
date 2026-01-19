@@ -16,7 +16,7 @@ class AccessTokenRetriever implements ResettableInterface
         if (!isset($this->accessToken)) {
             $authToken = ApplicationDefaultCredentials::getCredentials()->fetchAuthToken();
 
-            if (false === isset($authToken['access_token']) || false === \is_string($authToken['access_token'])) {
+            if (isset($authToken['access_token']) === false || \is_string($authToken['access_token']) === false) {
                 throw new \RuntimeException('Failed to retrieve access token');
             }
 
@@ -28,7 +28,7 @@ class AccessTokenRetriever implements ResettableInterface
         return $this->accessToken;
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->accessToken = null;
     }
