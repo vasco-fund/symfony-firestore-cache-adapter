@@ -1,6 +1,6 @@
 {
     "name": "vasco-fund/symfony-firestore-cache-adapter",
-    "description": "Symfony Cache adapter for Google Cloud Firestore - Production-ready PSR-6 implementation with tag support, compression, and automatic pruning",
+    "description": "Symfony Cache adapter for Google Cloud Firestore - Production-ready PSR-6 implementation",
     "type": "library",
     "license": "MIT",
     "keywords": [
