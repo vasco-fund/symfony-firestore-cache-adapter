@@ -65,6 +65,53 @@ final readonly class FirestoreHttpClient implements FirestoreClientInterface
         ]);
     }
 
+    /**
+     * Atomically create a document, failing if a document with the same ID already exists.
+     *
+     * Uses Firestore's dedicated create endpoint:
+     *
+     *     POST /v1/projects/{p}/databases/{db}/documents/{collection}?documentId={id}
+     *
+     * This endpoint is intrinsically "create-only" — there is no race window between an existence
+     * check and the write. If a document with this ID already exists in the collection, Firestore
+     * returns ALREADY_EXISTS (HTTP 409) and this method returns false. This is the REST equivalent
+     * of `DocumentReference::create()` from the SDK, and is functionally equivalent to a
+     * `PATCH .../documents/{collection}/{id}?currentDocument.exists=false`.
+     *
+     * Returns true if the document was created, false on 409 (already exists). Any other 4xx/5xx
+     * status is surfaced as the underlying Symfony HttpClient exception.
+     */
+    public function createDocument(string $collection, string $documentId, array $data): bool
+    {
+        $url = \sprintf(
+            self::FIRESTORE_BASE_URL . '/documents/%s',
+            $this->projectId,
+            $this->database,
+            $collection,
+        );
+
+        $payload = [
+            'fields' => FieldFormatter::formatFields($data),
+        ];
+
+        $response = $this->httpClient->request('POST', $url, [
+            'headers' => $this->headers(),
+            'query' => ['documentId' => $documentId],
+            'json' => $payload,
+        ]);
+
+        $statusCode = $response->getStatusCode();
+        if ($statusCode === 409) {
+            return false;
+        }
+        if ($statusCode >= 400) {
+            // Surface the underlying Symfony HttpClient exception for any other error.
+            $response->getContent();
+        }
+
+        return true;
+    }
+
     public function deleteDocument(string $collection, string $documentId): void
     {
         $url = $this->documentUrl($collection, $documentId);

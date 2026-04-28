@@ -75,6 +75,79 @@ final class FirestoreHttpClientTest extends TestCase
         $client->setDocument('cache', 'doc', ['count' => 3]);
     }
 
+    public function testCreateDocumentReturnsTrueOnSuccess(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
+
+        $response->expects($this->once())
+            ->method('getStatusCode')
+            ->willReturn(200);
+        $response->expects($this->never())
+            ->method('getContent');
+
+        $httpClient->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'https://firestore.googleapis.com/v1/projects/project/databases/(default)/documents/cache',
+                $this->callback(function (array $options): bool {
+                    return $options['headers']['Authorization'] === 'Bearer token'
+                        && $options['query'] === ['documentId' => 'doc']
+                        && $options['json']['fields']['count'] === ['integerValue' => 3];
+                })
+            )
+            ->willReturn($response);
+
+        $client = $this->createClient($httpClient);
+
+        self::assertTrue($client->createDocument('cache', 'doc', ['count' => 3]));
+    }
+
+    public function testCreateDocumentReturnsFalseOnConflict(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
+
+        $response->expects($this->once())
+            ->method('getStatusCode')
+            ->willReturn(409);
+        $response->expects($this->never())
+            ->method('getContent');
+
+        $httpClient->expects($this->once())
+            ->method('request')
+            ->willReturn($response);
+
+        $client = $this->createClient($httpClient);
+
+        self::assertFalse($client->createDocument('cache', 'doc', ['count' => 3]));
+    }
+
+    public function testCreateDocumentSurfacesOtherHttpErrors(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $response = $this->createMock(ResponseInterface::class);
+
+        $response->expects($this->once())
+            ->method('getStatusCode')
+            ->willReturn(500);
+        $response->expects($this->once())
+            ->method('getContent')
+            ->willThrowException(new \RuntimeException('boom'));
+
+        $httpClient->expects($this->once())
+            ->method('request')
+            ->willReturn($response);
+
+        $client = $this->createClient($httpClient);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('boom');
+
+        $client->createDocument('cache', 'doc', ['count' => 3]);
+    }
+
     public function testDeleteDocumentIssuesDeleteRequest(): void
     {
         $httpClient = $this->createMock(HttpClientInterface::class);
