@@ -213,7 +213,7 @@ final class FirestoreAdapterTest extends TestCase
             ->with(
                 'cache',
                 'item',
-                $this->callback(function (array $data) use ($start): bool {
+                $this->callback(static function (array $data) use ($start): bool {
                     $expiry = $data['expiry'] ?? null;
 
                     return $expiry !== null
@@ -329,7 +329,7 @@ final class FirestoreAdapterTest extends TestCase
         $client = $this->createMock(FirestoreClientInterface::class);
 
         $marshaller->method('marshall')->willReturnCallback(
-            function (array $values, ?array &$failed): array {
+            static function (array $values, ?array &$failed): array {
                 $failed = ['bad'];
 
                 return [];
